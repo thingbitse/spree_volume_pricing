@@ -47,7 +47,7 @@ module Spree::VariantDecorator
   protected
 
   def use_master_variant_volume_pricing?
-    Spree::Config.use_master_variant_volume_pricing && !(product.master.join_volume_prices.count == 0)
+    SpreeVolumePricing::Config.use_master_variant_volume_pricing && !(product.master.join_volume_prices.count == 0)
   end
 
   def compute_volume_price_quantities(type, default_price, quantity, user)

@@ -5,9 +5,8 @@ module SpreeVolumePricing
    # https://dev-docs.spreecommerce.org/internals/preferences
 
    preference :enabled, :boolean, default: true
-   # preference :dark_chocolate, :boolean, default: true
-   # preference :color, :string, default: 'Red'
-   # preference :favorite_number, :integer
-   # preference :supported_locales, :array, default: [:en]
+   preference :use_master_variant_volume_pricing, :boolean, default: false
+   preference :volume_pricing_role, :string, default: 'wholesale'
+   preference :volume_pricing_role_dropship, :string, default: 'dropship'
   end
 end
