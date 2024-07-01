@@ -30,8 +30,8 @@ module Spree::VariantDecorator
   end
 
   # calculates the price based on quantity
-  def volume_price(quantity, user = nil)
-    compute_volume_price_quantities :volume_price, price, quantity, user
+  def volume_price(quantity, user = nil, currency = 'USD')
+    compute_volume_price_quantities :volume_price, price, quantity, user, currency
   end
 
   # return percent of earning
@@ -50,34 +50,36 @@ module Spree::VariantDecorator
     SpreeVolumePricing::Config.use_master_variant_volume_pricing && !(product.master.join_volume_prices.count == 0)
   end
 
-  def compute_volume_price_quantities(type, default_price, quantity, user)
+  def compute_volume_price_quantities(type, default_price, quantity, user, currency = 'USD')
     volume_prices = join_volume_prices user
+    volume_prices = product.master.join_volume_prices if volume_prices.count == 0 && use_master_variant_volume_pricing?
+
     if volume_prices.count == 0
       if use_master_variant_volume_pricing?
-        product.master.send(type, quantity, user)
+        product.master.send(type, quantity, user, currency)
       else
-        return default_price
+        return price_in(currency).amount
       end
     else
       volume_prices.each do |volume_price|
         if volume_price.include?(quantity)
-          return send "compute_#{type}".to_sym, volume_price
+          return send "compute_#{type}".to_sym, volume_price, currency
         end
       end
 
       # No price ranges matched.
-      default_price
+      price_in(currency).amount
     end
   end
 
-  def compute_volume_price(volume_price)
+  def compute_volume_price(volume_price, currency = 'USD')
     case volume_price.discount_type
     when 'price'
       return volume_price.amount
     when 'dollar'
       return price - volume_price.amount
     when 'percent'
-      return price * (1 - volume_price.amount)
+      return price_in(currency).amount * (1 - volume_price.amount)
     end
   end
 

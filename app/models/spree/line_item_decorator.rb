@@ -15,8 +15,8 @@ module Spree::LineItemDecorator
       return unless variant
 
       if changed? && changes.keys.include?('quantity')
-        vprice = variant.volume_price(quantity, order.user)
-        if price.present? && vprice <= variant.price
+        vprice = variant.volume_price(quantity, order.user, order.currency)
+        if price.present? && vprice <= variant.price_in(order.currency).amount
         self.price = vprice and return
         end
       end
