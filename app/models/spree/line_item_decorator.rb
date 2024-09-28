@@ -11,6 +11,7 @@ module Spree::LineItemDecorator
     old_copy_price = base.instance_method(:copy_price)
 
     define_method(:copy_price) do
+      return if try(:price_locked)
       old_copy_price.bind(self).call
       return unless variant
 
